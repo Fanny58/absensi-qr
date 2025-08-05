@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Absensi QR Code</title>
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f0f0f0; }
+    .login, .scanner { max-width: 400px; margin: auto; background: #fff; padding: 20px; border-radius: 10px; }
+    .hidden { display: none; }
+    button { padding: 10px 20px; margin-top: 10px; }
+  </style>
+</head>
+<body>
+
+  <div class="login" id="loginForm">
+    <h2>Login Petugas</h2>
+    <input type="text" id="username" placeholder="Username" required/><br/>
+    <input type="password" id="password" placeholder="Password" required/><br/>
+    <button onclick="login()">Login</button>
+    <p id="loginError" style="color:red;"></p>
+  </div>
+
+  <div class="scanner hidden" id="scanner">
+    <h2>Scan QR Code</h2>
+    <div id="qr-reader" style="width: 300px"></div>
+    <p id="result"></p>
+    <button onclick="logout()">Logout</button>
+  </div>
+
+  <script>
+    const allowedUsers = {
+      admin1: "12345",
+      admin2: "abcde"
+    };
+
+    function login() {
+      const user = document.getElementById("username").value;
+      const pass = document.getElementById("password").value;
+      if (allowedUsers[user] === pass) {
+        document.getElementById("loginForm").classList.add("hidden");
+        document.getElementById("scanner").classList.remove("hidden");
+        startScanner();
+      } else {
+        document.getElementById("loginError").textContent = "Username atau password salah.";
+      }
+    }
+
+    function logout() {
+      location.reload();
+    }
+
+    function startScanner() {
+      const qrScanner = new Html5Qrcode("qr-reader");
+      qrScanner.start(
+        { facingMode: "environment" },
+        {
+          fps: 10,
+          qrbox: 250
+        },
+        (decodedText) => {
+          qrScanner.stop();
+          document.getElementById("result").innerText = "QR Terdeteksi: " + decodedText;
+          kirimAbsensi(decodedText);
+          setTimeout(() => location.reload(), 3000);
+        },
+        (errorMessage) => {
+          // console.log(errorMessage);
+        }
+      ).catch(err => {
+        document.getElementById("result").innerText = "Gagal memulai kamera: " + err;
+      });
+    }
+
+    function kirimAbsensi(nama) {
+      const waktu = new Date().toLocaleString("id-ID", { timeZone: "Asia/Jakarta" });
+      fetch("https://script.google.com/macros/s/AKfycbzoa0ptvmWwjieiSXZ0Ek8-4yGSBN4KHSIaF3voz_hqRGXj75vvCWpt69Uv6q_vn26siA/exec", {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nama: nama, waktu: waktu })
+      }).then(() => {
+        document.getElementById("result").innerText += "\nAbsensi berhasil!";
+      }).catch(() => {
+        document.getElementById("result").innerText += "\nGagal mengirim ke server.";
+      });
+    }
+  </script>
+
+</body>
+</html>
