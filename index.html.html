@@ -1,0 +1,95 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Absensi QR Code</title>
+  <script src="https://unpkg.com/html5-qrcode"></script>
+  <style>
+    body { font-family: Arial; text-align: center; margin: 0; padding: 20px; background: #f5f5f5; }
+    .login-container, .scanner-container { max-width: 400px; margin: auto; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    input { padding: 10px; margin: 10px 0; width: 90%; }
+    button { padding: 10px 20px; }
+    #reader { width: 100%; margin-top: 20px; }
+    #result { font-size: 1.2em; color: green; margin-top: 15px; }
+  </style>
+</head>
+<body>
+
+<div class="login-container" id="login">
+  <h2>Login Petugas</h2>
+  <input type="text" id="username" placeholder="Username" />
+  <input type="password" id="password" placeholder="Password" />
+  <button onclick="login()">Login</button>
+  <p id="login-msg" style="color:red;"></p>
+</div>
+
+<div class="scanner-container" id="scanner" style="display:none;">
+  <h2>Scan QR Code Siswa</h2>
+  <div id="reader"></div>
+  <div id="result"></div>
+  <button onclick="logout()">Logout</button>
+</div>
+
+<script>
+  const allowedUsers = {
+    "petugas1": "12345",
+    "petugas2": "67890"
+  };
+
+  function login() {
+    const u = document.getElementById("username").value;
+    const p = document.getElementById("password").value;
+    if (allowedUsers[u] === p) {
+      document.getElementById("login").style.display = "none";
+      document.getElementById("scanner").style.display = "block";
+      startScanner();
+    } else {
+      document.getElementById("login-msg").innerText = "Username atau password salah!";
+    }
+  }
+
+  function logout() {
+    location.reload();
+  }
+
+  let html5QrcodeScanner;
+
+  function startScanner() {
+    const reader = new Html5Qrcode("reader");
+    reader.start(
+      { facingMode: "environment" },
+      {
+        fps: 10,
+        qrbox: { width: 250, height: 250 }
+      },
+      qrCodeMessage => {
+        reader.stop();
+        document.getElementById("result").innerText = "📡 Mengirim data...";
+        sendToSheet(qrCodeMessage);
+      },
+      error => {
+        // console.warn(`QR error: ${error}`);
+      }
+    ).catch(err => {
+      document.getElementById("result").innerText = "Gagal akses kamera: " + err;
+    });
+  }
+
+  function sendToSheet(id) {
+    fetch("https://script.google.com/macros/s/AKfycbzoa0ptvmWwjieiSXZ0Ek8-4yGSBN4KHSIaF3voz_hqRGXj75vvCWpt69Uv6q_vn26siA/exec", {
+      method: "POST",
+      body: new URLSearchParams("id=" + id)
+    })
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById("result").innerText = data.message || "✅ Absen berhasil";
+    })
+    .catch(err => {
+      document.getElementById("result").innerText = "❌ Gagal terhubung ke server: " + err;
+    });
+  }
+</script>
+
+</body>
+</html>
