@@ -1,16 +1,19 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <title>Absensi QR</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Absensi QR Code</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>Scan QR Absensi</h1>
-  <video id="preview"></video>
-  <p id="status">Menunggu scan...</p>
+  <div class="container">
+    <h1>Absensi QR Code</h1>
+    <div id="reader"></div>
+    <div id="status"></div>
+  </div>
 
-  <script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
   <script src="script.js"></script>
 </body>
 </html>
