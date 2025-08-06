@@ -1,5 +1,4 @@
-// Ganti URL ini dengan URL Apps Script Anda
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwBcZyg8G1QOsV0KhXJbssgRYBJSMhKLGMuhh89aA-7/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz3eZP3OZlzcz0y5pSC-ycsOcF54Y2tYOj7X99nvVWC6AwYKHsqYMvU5pv8fBTqRshmVA/exec";
 
 const scanner = new Html5Qrcode("reader");
 
@@ -15,25 +14,25 @@ function startScanner() {
           qrbox: 250
         },
         qrCodeMessage => {
-          scanner.stop(); // Hentikan pemindaian saat berhasil scan
+          scanner.stop(); // Stop kamera
           handleScan(qrCodeMessage);
         },
         errorMessage => {
-          // console.warn(`QR error: ${errorMessage}`);
+          // error scanning (bisa dikosongkan)
         }
       ).catch(err => {
-        console.error("Camera start error:", err);
-        showNotification("❌ Gagal mengakses kamera.");
+        console.error("Error membuka kamera:", err);
+        showNotification("❌ Tidak bisa membuka kamera.");
       });
     }
   }).catch(err => {
-    console.error("Camera not found:", err);
-    showNotification("❌ Tidak ada kamera terdeteksi.");
+    console.error("Kamera tidak ditemukan:", err);
+    showNotification("❌ Kamera tidak tersedia.");
   });
 }
 
 function handleScan(qrData) {
-  showNotification("📡 Mengirim data absensi...");
+  showNotification("📡 Mengirim absensi...");
 
   fetch(`${SCRIPT_URL}?qr_id=${encodeURIComponent(qrData)}`)
     .then(response => response.json())
@@ -45,12 +44,12 @@ function handleScan(qrData) {
       }
     })
     .catch(error => {
-      console.error("Fetch error:", error);
-      showNotification("❌ Gagal mengirim data ke server.");
+      console.error("Error mengirim data:", error);
+      showNotification("❌ Gagal mengirim data ke Google Sheet.");
     })
     .finally(() => {
       setTimeout(() => {
-        startScanner(); // Restart scanner
+        startScanner(); // Mulai ulang scanner setelah 3 detik
       }, 3000);
     });
 }
