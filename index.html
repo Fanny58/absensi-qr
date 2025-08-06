@@ -1,59 +1,19 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Absensi QR Code</title>
-  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 20px;
-    }
-    #reader {
-      width: 300px;
-      margin: auto;
-    }
-    #status {
-      margin-top: 20px;
-      font-size: 18px;
-      color: green;
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Absensi</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h2>Scan QR Code untuk Absen</h2>
-
-  <div id="reader"></div>
-  <div id="status"></div>
-
-  <script>
-    function onScanSuccess(qrCodeMessage) {
-      document.getElementById("status").innerHTML = `Memproses ID: ${qrCodeMessage}`;
-
-      fetch("https://script.google.com/macros/s/AKfycbz3eZP3OZlzcz0y5pSC-ycsOcF54Y2tYOj7X99nvVWC6AwYKHsqYMvU5pv8fBTqRshmVA/exec", {
-        method: "POST",
-        body: new URLSearchParams({
-          qr: qrCodeMessage
-        })
-      })
-      .then(response => response.text())
-      .then(result => {
-        document.getElementById("status").innerHTML = result;
-      })
-      .catch(error => {
-        document.getElementById("status").innerHTML = "Gagal mengirim data: " + error;
-      });
-
-      html5QrcodeScanner.clear(); // stop scanning setelah sukses
-    }
-
-    var html5QrcodeScanner = new Html5QrcodeScanner(
-      "reader", 
-      { fps: 10, qrbox: 250 },
-      /* verbose= */ false);
-    html5QrcodeScanner.render(onScanSuccess);
-  </script>
+  <div class="login-container">
+    <h1>Login Absensi</h1>
+    <input type="text" id="username" placeholder="Username" />
+    <input type="password" id="password" placeholder="Password" />
+    <button onclick="login()">Login</button>
+    <p id="login-msg"></p>
+  </div>
+  <script src="script.js"></script>
 </body>
 </html>
-
