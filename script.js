@@ -1,63 +1,31 @@
-// ========================
-// LOGIN LOGIC
-// ========================
-function login() {
-  const user = document.getElementById("username").value;
-  const pass = document.getElementById("password").value;
-  const msg = document.getElementById("login-msg");
+let scanner = new Instascan.Scanner({ video: document.getElementById('preview'), mirror: false });
 
-  if (
-    (user === "admin1" && pass === "1234") ||
-    (user === "admin2" && pass === "abcd")
-  ) {
-    localStorage.setItem("isLoggedIn", "true");
-    window.location.href = "scan.html";
-  } else {
-    msg.innerText = "Username atau password salah.";
-  }
-}
+scanner.addListener('scan', function (content) {
+  const status = document.getElementById('status');
+  status.innerText = 'QR ditemukan, mengirim...';
 
-// ========================
-// QR SCAN + POST KE SHEET
-// ========================
-if (window.location.pathname.includes("scan.html")) {
-  // Cek login
-  if (localStorage.getItem("isLoggedIn") !== "true") {
-    alert("Silakan login terlebih dahulu.");
-    window.location.href = "index.html";
-  }
-
-  const status = document.getElementById("status");
-
-  let scanner = new Instascan.Scanner({ video: document.getElementById("preview") });
-  scanner.addListener("scan", function (content) {
-    status.innerText = "QR ditemukan, mengirim...";
-
-    fetch(
-      "https://script.google.com/macros/s/AKfycbz3eZP3OZlzcz0y5pSC-ycsOcF54Y2tYOj7X99nvVWC6AwYKHsqYMvU5pv8fBTqRshmVA/exec?qr_id=" + encodeURIComponent(content),
-      {
-        method: "POST",
-      }
-    )
-      .then((res) => res.text())
-      .then((text) => {
-        status.innerText = text.includes("berhasil") ? `✅ ${text}` : `⚠️ ${text}`;
-      })
-      .catch((err) => {
-        status.innerText = "❌ Gagal kirim data: " + err;
-      });
-  });
-
-  Instascan.Camera.getCameras()
-    .then(function (cameras) {
-      if (cameras.length > 0) {
-        scanner.start(cameras[0]);
-      } else {
-        status.innerText = "❌ Tidak ada kamera ditemukan.";
-      }
+  fetch('https://script.google.com/macros/s/AKfycbz3eZP3OZlzcz0y5pSC-ycsOcF54Y2tYOj7X99nvVWC6AwYKHsqYMvU5pv8fBTqRshmVA/exec?qr_id=' + content, {
+    method: 'POST',
+  })
+    .then(res => res.text())
+    .then(text => {
+      status.innerText = text;
     })
-    .catch(function (e) {
-      console.error(e);
-      status.innerText = "❌ Kesalahan kamera: " + e;
+    .catch(err => {
+      status.innerText = 'Gagal kirim data: ' + err;
     });
-}
+});
+
+Instascan.Camera.getCameras().then(function (cameras) {
+  let backCamera = cameras.find(cam => cam.name.toLowerCase().includes('back') || cam.name.toLowerCase().includes('environment'));
+  if (backCamera) {
+    scanner.start(backCamera);
+  } else if (cameras.length > 0) {
+    scanner.start(cameras[0]); // fallback ke kamera pertama
+  } else {
+    document.getElementById('status').innerText = 'Tidak ada kamera ditemukan.';
+  }
+}).catch(function (e) {
+  console.error(e);
+  document.getElementById('status').innerText = 'Kesalahan kamera: ' + e;
+});
