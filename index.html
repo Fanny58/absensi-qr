@@ -2,18 +2,15 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login Absensi</title>
+  <title>Absensi QR</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="login-container">
-    <h1>Login Absensi</h1>
-    <input type="text" id="username" placeholder="Username" />
-    <input type="password" id="password" placeholder="Password" />
-    <button onclick="login()">Login</button>
-    <p id="login-msg"></p>
-  </div>
+  <h1>Scan QR Absensi</h1>
+  <video id="preview"></video>
+  <p id="status">Menunggu scan...</p>
+
+  <script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
