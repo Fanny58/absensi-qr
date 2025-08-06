@@ -1,31 +1,36 @@
-let scanner = new Instascan.Scanner({ video: document.getElementById('preview'), mirror: false });
+const scriptURL = "https://script.google.com/macros/s/YOUR_DEPLOYED_SCRIPT_ID/exec";
 
-scanner.addListener('scan', function (content) {
-  const status = document.getElementById('status');
-  status.innerText = 'QR ditemukan, mengirim...';
+function showStatus(message, success = true) {
+  const statusEl = document.getElementById("status");
+  statusEl.innerText = message;
+  statusEl.style.color = success ? "green" : "red";
+}
 
-  fetch('https://script.google.com/macros/s/AKfycbz3eZP3OZlzcz0y5pSC-ycsOcF54Y2tYOj7X99nvVWC6AwYKHsqYMvU5pv8fBTqRshmVA/exec?qr_id=' + content, {
-    method: 'POST',
+function sendToSheet(qrData) {
+  fetch(scriptURL, {
+    method: "POST",
+    body: new URLSearchParams({ qr_id: qrData }),
   })
-    .then(res => res.text())
-    .then(text => {
-      status.innerText = text;
+    .then(res => res.json())
+    .then(res => {
+      if (res.success) {
+        showStatus("Absensi berhasil!");
+      } else {
+        showStatus(res.message, false);
+      }
     })
-    .catch(err => {
-      status.innerText = 'Gagal kirim data: ' + err;
-    });
-});
+    .catch(() => showStatus("Gagal mengirim data!", false));
+}
 
-Instascan.Camera.getCameras().then(function (cameras) {
-  let backCamera = cameras.find(cam => cam.name.toLowerCase().includes('back') || cam.name.toLowerCase().includes('environment'));
-  if (backCamera) {
-    scanner.start(backCamera);
-  } else if (cameras.length > 0) {
-    scanner.start(cameras[0]); // fallback ke kamera pertama
-  } else {
-    document.getElementById('status').innerText = 'Tidak ada kamera ditemukan.';
-  }
-}).catch(function (e) {
-  console.error(e);
-  document.getElementById('status').innerText = 'Kesalahan kamera: ' + e;
-});
+function onScanSuccess(decodedText) {
+  html5QrcodeScanner.clear().then(() => {
+    sendToSheet(decodedText.trim());
+  });
+}
+
+const html5QrcodeScanner = new Html5QrcodeScanner("reader", {
+  fps: 10,
+  qrbox: 250,
+}, false);
+
+html5QrcodeScanner.render(onScanSuccess);
