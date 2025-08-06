@@ -1,4 +1,5 @@
-const scriptURL = "https://script.google.com/macros/s/YOUR_DEPLOYED_SCRIPT_ID/exec";
+const scriptURL = "https://script.google.com/macros/s/AKfycbz3eZP3OZlzcz0y5pSC-ycsOcF54Y2tYOj7X99nvVWC6AwYKHsqYMvU5pv8fBTqRshmVA/exec";
+
 
 function showStatus(message, success = true) {
   const statusEl = document.getElementById("status");
