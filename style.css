@@ -1,18 +1,27 @@
 body {
   font-family: Arial, sans-serif;
   text-align: center;
+  margin: 0;
+  padding: 0;
+  background: #f9f9f9;
+}
+
+.container {
+  max-width: 500px;
+  margin: auto;
   padding: 20px;
-  background: #f8f9fa;
 }
 
-video {
+h1 {
+  color: #333;
+}
+
+#reader {
   width: 100%;
-  max-width: 400px;
-  border: 2px solid #333;
-  border-radius: 10px;
+  margin-top: 20px;
 }
 
-p#status {
-  margin-top: 10px;
+#status {
+  margin-top: 20px;
   font-weight: bold;
 }
