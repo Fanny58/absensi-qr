@@ -1,47 +1,63 @@
-body {
-  font-family: sans-serif;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  margin: 0;
-  background-color: #f2f2f2;
+// ========================
+// LOGIN LOGIC
+// ========================
+function login() {
+  const user = document.getElementById("username").value;
+  const pass = document.getElementById("password").value;
+  const msg = document.getElementById("login-msg");
+
+  if (
+    (user === "admin1" && pass === "1234") ||
+    (user === "admin2" && pass === "abcd")
+  ) {
+    localStorage.setItem("isLoggedIn", "true");
+    window.location.href = "scan.html";
+  } else {
+    msg.innerText = "Username atau password salah.";
+  }
 }
 
-.login-container,
-.scan-container {
-  background: white;
-  padding: 2rem;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-  text-align: center;
-  width: 90%;
-  max-width: 400px;
-}
+// ========================
+// QR SCAN + POST KE SHEET
+// ========================
+if (window.location.pathname.includes("scan.html")) {
+  // Cek login
+  if (localStorage.getItem("isLoggedIn") !== "true") {
+    alert("Silakan login terlebih dahulu.");
+    window.location.href = "index.html";
+  }
 
-input {
-  width: 100%;
-  padding: 10px;
-  margin: 0.5rem 0;
-  font-size: 16px;
-}
+  const status = document.getElementById("status");
 
-button {
-  width: 100%;
-  padding: 10px;
-  background-color: #2196f3;
-  color: white;
-  font-size: 16px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
+  let scanner = new Instascan.Scanner({ video: document.getElementById("preview") });
+  scanner.addListener("scan", function (content) {
+    status.innerText = "QR ditemukan, mengirim...";
 
-button:hover {
-  background-color: #1976d2;
-}
+    fetch(
+      "https://script.google.com/macros/s/AKfycbz3eZP3OZlzcz0y5pSC-ycsOcF54Y2tYOj7X99nvVWC6AwYKHsqYMvU5pv8fBTqRshmVA/exec?qr_id=" + encodeURIComponent(content),
+      {
+        method: "POST",
+      }
+    )
+      .then((res) => res.text())
+      .then((text) => {
+        status.innerText = text.includes("berhasil") ? `✅ ${text}` : `⚠️ ${text}`;
+      })
+      .catch((err) => {
+        status.innerText = "❌ Gagal kirim data: " + err;
+      });
+  });
 
-video {
-  width: 100%;
-  margin-top: 1rem;
+  Instascan.Camera.getCameras()
+    .then(function (cameras) {
+      if (cameras.length > 0) {
+        scanner.start(cameras[0]);
+      } else {
+        status.innerText = "❌ Tidak ada kamera ditemukan.";
+      }
+    })
+    .catch(function (e) {
+      console.error(e);
+      status.innerText = "❌ Kesalahan kamera: " + e;
+    });
 }
