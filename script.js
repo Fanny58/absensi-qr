@@ -1,37 +1,62 @@
-const scriptURL = "https://script.google.com/macros/s/AKfycbz3eZP3OZlzcz0y5pSC-ycsOcF54Y2tYOj7X99nvVWC6AwYKHsqYMvU5pv8fBTqRshmVA/exec";
+// Ganti URL ini dengan URL Apps Script Anda
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwBcZyg8G1QOsV0KhXJbssgRYBJSMhKLGMuhh89aA-7/exec";
 
+const scanner = new Html5Qrcode("reader");
 
-function showStatus(message, success = true) {
-  const statusEl = document.getElementById("status");
-  statusEl.innerText = message;
-  statusEl.style.color = success ? "green" : "red";
-}
+function startScanner() {
+  Html5Qrcode.getCameras().then(devices => {
+    if (devices && devices.length) {
+      const backCamera = devices.find(device => device.label.toLowerCase().includes("back")) || devices[0];
 
-function sendToSheet(qrData) {
-  fetch(scriptURL, {
-    method: "POST",
-    body: new URLSearchParams({ qr_id: qrData }),
-  })
-    .then(res => res.json())
-    .then(res => {
-      if (res.success) {
-        showStatus("Absensi berhasil!");
-      } else {
-        showStatus(res.message, false);
-      }
-    })
-    .catch(() => showStatus("Gagal mengirim data!", false));
-}
-
-function onScanSuccess(decodedText) {
-  html5QrcodeScanner.clear().then(() => {
-    sendToSheet(decodedText.trim());
+      scanner.start(
+        { deviceId: { exact: backCamera.id } },
+        {
+          fps: 10,
+          qrbox: 250
+        },
+        qrCodeMessage => {
+          scanner.stop(); // Hentikan pemindaian saat berhasil scan
+          handleScan(qrCodeMessage);
+        },
+        errorMessage => {
+          // console.warn(`QR error: ${errorMessage}`);
+        }
+      ).catch(err => {
+        console.error("Camera start error:", err);
+        showNotification("❌ Gagal mengakses kamera.");
+      });
+    }
+  }).catch(err => {
+    console.error("Camera not found:", err);
+    showNotification("❌ Tidak ada kamera terdeteksi.");
   });
 }
 
-const html5QrcodeScanner = new Html5QrcodeScanner("reader", {
-  fps: 10,
-  qrbox: 250,
-}, false);
+function handleScan(qrData) {
+  showNotification("📡 Mengirim data absensi...");
 
-html5QrcodeScanner.render(onScanSuccess);
+  fetch(`${SCRIPT_URL}?qr_id=${encodeURIComponent(qrData)}`)
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        showNotification(`✅ ${data.nama} berhasil absen pada ${data.waktu}`);
+      } else {
+        showNotification(`⚠️ ${data.message}`);
+      }
+    })
+    .catch(error => {
+      console.error("Fetch error:", error);
+      showNotification("❌ Gagal mengirim data ke server.");
+    })
+    .finally(() => {
+      setTimeout(() => {
+        startScanner(); // Restart scanner
+      }, 3000);
+    });
+}
+
+function showNotification(message) {
+  const notif = document.getElementById("notification");
+  notif.innerText = message;
+  notif.style.display = "block";
+}
