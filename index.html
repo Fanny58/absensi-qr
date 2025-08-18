@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sistem Keuangan & Absensi</title>
+    <title>ArtaKita</title>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
@@ -19,14 +19,14 @@
 
     <div id="app-container" class="container">
       <header>
-        <h1>Sistem Keuangan & Absensi</h1>
+        <h1>ArtaKita</h1>
         <button id="logout-btn">Logout</button>
       </header>
 
       <nav class="app-nav">
         <button id="nav-tabungan" class="nav-tab active">Tabungan Siswa</button>
-        <button id="nav-kas" class="nav-tab">Kas Paskibra (Segera)</button>
-        <button id="nav-absensi" class="nav-tab">Absensi (Segera)</button>
+        <button id="nav-kas" class="nav-tab">Kas Paskibra</button>
+        <button id="nav-absensi" class="nav-tab">Absensi</button>
       </nav>
 
       <main id="tabungan-section" class="tab-content active">
@@ -49,6 +49,142 @@
               </tr>
             </thead>
             <tbody id="tabungan-tbody"></tbody>
+          </table>
+        </div>
+      </main>
+
+      <main id="kas-section" class="tab-content">
+        <h2>Data Kas Paskibra</h2>
+        <div id="kas-summary">
+          <div class="summary-card">
+            <h4>Total Pemasukan</h4>
+            <p id="kas-pemasukan">Rp 0</p>
+          </div>
+          <div class="summary-card">
+            <h4>Total Pengeluaran</h4>
+            <p id="kas-pengeluaran">Rp 0</p>
+          </div>
+          <div class="summary-card saldo">
+            <h4>Saldo Akhir</h4>
+            <p id="kas-saldo">Rp 0</p>
+          </div>
+        </div>
+        <button id="btn-show-kas-modal" class="btn-add-new">
+          + Tambah Transaksi Kas
+        </button>
+        <div id="kas-loader" class="loader">Memuat data...</div>
+        <div class="table-wrapper">
+          <table id="kas-log-table">
+            <thead>
+              <tr>
+                <th>Tanggal</th>
+                <th>Nama</th>
+                <th>Keterangan</th>
+                <th>Jenis</th>
+                <th>Jumlah</th>
+              </tr>
+            </thead>
+            <tbody id="kas-log-tbody"></tbody>
+          </table>
+        </div>
+      </main>
+
+      <main id="absensi-section" class="tab-content">
+        <h2>Absensi Paskibra</h2>
+        <div id="absensi-summary" class="summary-grid">
+          <div class="summary-card">
+            <h4>Hadir</h4>
+            <p id="summary-hadir">0</p>
+          </div>
+          <div class="summary-card">
+            <h4>Sakit</h4>
+            <p id="summary-sakit">0</p>
+          </div>
+          <div class="summary-card">
+            <h4>Izin</h4>
+            <p id="summary-izin">0</p>
+          </div>
+          <div class="summary-card">
+            <h4>Total Anggota</h4>
+            <p id="summary-total">0</p>
+          </div>
+        </div>
+        <div class="absensi-container">
+          <div class="absensi-card">
+            <h3>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path
+                  d="M0 4h2v16h-2v-16zm4 0h1v16h-1v-16zm2 0h1v16h-1v-16zm3 0h1v16h-1v-16zm2 0h1v16h-1v-16zm3 0h2v16h-2v-16zm4 0h1v16h-1v-16zm2 0h1v16h-1v-16z"
+                />
+              </svg>
+              Scan QR Code (Hadir)
+            </h3>
+            <div id="qr-reader" style="display: none"></div>
+            <div id="qr-scan-feedback"></div>
+            <button id="start-scan-btn" class="btn-scan">
+              Mulai Scan Kamera
+            </button>
+            <button
+              id="stop-scan-btn"
+              class="btn-stop-scan"
+              style="display: none"
+            >
+              Hentikan Kamera
+            </button>
+          </div>
+          <div class="absensi-card">
+            <h3>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path
+                  d="M7.127 22.564l-7.126 1.436 1.438-7.125 5.688 5.689zm-4.274-5.924l5.688 5.689 15.46-15.46-5.689-5.689-15.459 15.46z"
+                />
+              </svg>
+              Input Manual
+            </h3>
+            <form id="form-absensi-manual">
+              <label for="absensi-nama-anggota">Pilih Anggota:</label>
+              <select id="absensi-nama-anggota" required>
+                <option value="">-- Memuat anggota... --</option>
+              </select>
+              <label for="absensi-keterangan">Keterangan:</label>
+              <select id="absensi-keterangan" required>
+                <option value="Hadir">Hadir</option>
+                <option value="Sakit">Sakit</option>
+                <option value="Izin">Izin</option>
+              </select>
+              <button type="submit" id="submit-absensi-manual">
+                Simpan Absen
+              </button>
+            </form>
+          </div>
+        </div>
+        <h3>Log Absensi Hari Ini</h3>
+        <div id="absensi-loader" class="loader">Memuat log absensi...</div>
+        <div class="table-wrapper">
+          <table id="absensi-log-table">
+            <thead>
+              <tr>
+                <th>Waktu</th>
+                <th>NIS</th>
+                <th>Nama</th>
+                <th>Kelas</th>
+                <th>Bidang</th>
+                <th>Keterangan</th>
+              </tr>
+            </thead>
+            <tbody id="absensi-log-tbody"></tbody>
           </table>
         </div>
       </main>
@@ -95,19 +231,46 @@
       </div>
     </div>
 
-    <script
-      src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"
-      type="module"
-    ></script>
-    <script
-      src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"
-      type="module"
-    ></script>
-    <script
-      src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"
-      type="module"
-    ></script>
+    <div id="modal-kas" class="modal">
+      <div class="modal-content">
+        <span class="close-btn" data-modal-id="modal-kas">&times;</span>
+        <h2>Transaksi Kas Paskibra</h2>
+        <form id="form-kas">
+          <label for="jenis-kas">Jenis Transaksi:</label
+          ><select id="jenis-kas" required>
+            <option value="Pemasukan">Pemasukan</option>
+            <option value="Pengeluaran">Pengeluaran</option>
+          </select>
+          <div id="pemasukan-anggota-field">
+            <label for="kas-nama-anggota">Nama Anggota (untuk iuran):</label
+            ><select id="kas-nama-anggota">
+              <option value="|-- Transaksi Umum / Lainnya --">
+                -- Transaksi Umum / Lainnya --
+              </option>
+            </select>
+          </div>
+          <label for="keterangan-kas">Keterangan:</label
+          ><input
+            type="text"
+            id="keterangan-kas"
+            placeholder="Contoh: Iuran minggu ke-3"
+            required
+          /><label for="jumlah-kas">Jumlah (Rp):</label
+          ><input
+            type="number"
+            id="jumlah-kas"
+            placeholder="5000"
+            required
+            min="1"
+          /><button type="submit">Simpan</button>
+        </form>
+      </div>
+    </div>
 
+    <script
+      src="https://unpkg.com/html5-qrcode"
+      type="text/javascript"
+    ></script>
     <script src="config.js" type="module"></script>
     <script src="script.js" type="module"></script>
   </body>
