@@ -1,19 +1,114 @@
 <!DOCTYPE html>
 <html lang="id">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Absensi QR Code</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-  <div class="container">
-    <h1>Absensi QR Code</h1>
-    <div id="reader"></div>
-    <div id="status"></div>
-  </div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sistem Keuangan & Absensi</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div id="login-container" class="container active">
+      <h1>Login Admin</h1>
+      <form id="login-form">
+        <input type="text" id="username" placeholder="Username" required />
+        <input type="password" id="password" placeholder="Password" required />
+        <button type="submit">Login</button>
+        <p id="login-error" class="error-message"></p>
+      </form>
+    </div>
 
-  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-  <script src="script.js"></script>
-</body>
+    <div id="app-container" class="container">
+      <header>
+        <h1>Sistem Keuangan & Absensi</h1>
+        <button id="logout-btn">Logout</button>
+      </header>
+
+      <nav class="app-nav">
+        <button id="nav-tabungan" class="nav-tab active">Tabungan Siswa</button>
+        <button id="nav-kas" class="nav-tab">Kas Paskibra (Segera)</button>
+        <button id="nav-absensi" class="nav-tab">Absensi (Segera)</button>
+      </nav>
+
+      <main id="tabungan-section" class="tab-content active">
+        <h2>Data Tabungan Siswa</h2>
+        <button id="btn-show-add-siswa-modal" class="btn-add-new">
+          + Tambah Siswa Baru
+        </button>
+        <div id="tabungan-loader" class="loader">Memuat data...</div>
+        <div class="table-wrapper">
+          <table id="tabungan-table">
+            <thead>
+              <tr>
+                <th>No.</th>
+                <th>NIS</th>
+                <th>Nama</th>
+                <th>Kelas</th>
+                <th>Total Tabungan</th>
+                <th>Bidang</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="tabungan-tbody"></tbody>
+          </table>
+        </div>
+      </main>
+    </div>
+
+    <div id="modal-add-siswa" class="modal">
+      <div class="modal-content">
+        <span class="close-btn" data-modal-id="modal-add-siswa">&times;</span>
+        <h2>Tambah Siswa Baru</h2>
+        <form id="form-add-siswa">
+          <label for="add-nis">NIS:</label
+          ><input type="text" id="add-nis" required /><label for="add-nama"
+            >Nama:</label
+          ><input type="text" id="add-nama" required /><label for="add-kelas"
+            >Kelas:</label
+          ><input type="text" id="add-kelas" required /><label for="add-bidang"
+            >Bidang:</label
+          ><input type="text" id="add-bidang" /><button type="submit">
+            Simpan Siswa
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div id="modal-tabungan" class="modal">
+      <div class="modal-content">
+        <span class="close-btn" data-modal-id="modal-tabungan">&times;</span>
+        <h2>Transaksi Tabungan</h2>
+        <p><strong>Nama:</strong> <span id="modal-tabungan-nama"></span></p>
+        <form id="form-tabungan">
+          <label for="jenis-tabungan">Jenis Transaksi:</label
+          ><select id="jenis-tabungan" required>
+            <option value="Setoran">Setoran</option>
+            <option value="Penarikan">Penarikan</option></select
+          ><label for="jumlah-tabungan">Jumlah (Rp):</label
+          ><input
+            type="number"
+            id="jumlah-tabungan"
+            placeholder="10000"
+            required
+            min="1"
+          /><button type="submit">Simpan</button>
+        </form>
+      </div>
+    </div>
+
+    <script
+      src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"
+      type="module"
+    ></script>
+    <script
+      src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"
+      type="module"
+    ></script>
+    <script
+      src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"
+      type="module"
+    ></script>
+
+    <script src="config.js" type="module"></script>
+    <script src="script.js" type="module"></script>
+  </body>
 </html>
